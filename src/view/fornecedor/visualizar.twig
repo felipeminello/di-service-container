@@ -1,0 +1,47 @@
+{% extends "layout.twig" %}
+
+{% block title %}Cadastro de Fornecedor{% endblock %}
+
+{% block content %}
+    <h1>Cadastro de Fornecedor</h1>
+    <input type="hidden" id="id" value="{{ fornecedor.getID() }}">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="well well-sm">
+                <h4>Nome</h4>
+                <p>{{ fornecedor.getNome() }}</p>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="well well-sm">
+                <h4>Email</h4>
+                <p>{{ fornecedor.getEmail() }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <button class="btn btn-primary" id="btn_inserir" type="button">Inserir Fornecedor</button>
+            <button class="btn btn-primary" id="btn_listar" type="button">Listar Fornecedores</button>
+            <button class="btn btn-primary" id="btn_editar" type="button">Editar esse fornecedor</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#btn_editar').click(function() {
+            location.href = '{{ linkEditar }}';
+        });
+
+        $('#btn_listar').click(function() {
+            location.href = '{{ linkListar }}';
+        });
+
+        $('#btn_inserir').click(function() {
+            location.href = '{{ linkInserir }}';
+        });
+    });
+</script>
+{% endblock %}

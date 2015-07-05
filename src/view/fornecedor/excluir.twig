@@ -1,0 +1,11 @@
+{% extends "layout.twig" %}
+
+{% block title %}Excluir Fornecedor{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="alert {% if retorno.r == true %} alert-success {% else %} alert-danger {% endif %}">
+            {{ retorno.m }}
+        </div>
+    </div>
+{% endblock %}

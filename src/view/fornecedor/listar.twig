@@ -1,0 +1,112 @@
+{% extends "layout.twig" %}
+
+{% block title %}Lista de Fornecedores{% endblock %}
+
+{% block content %}
+    <h1>Lista de Fornecedores</h1>
+    {% if listaFornecedor|length > 0 %}
+        <form method="post" id="lista">
+        <table id="lista_fornecedor" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th width="40" class="check" style="text-align: center;cursor: pointer;"><input type="checkbox" id="check_all" value="1" style="cursor: pointer;"></th>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th width="120" style="text-align: center;">Ação</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for fornecedor in listaFornecedor %}
+                <tr id="row{{ fornecedor.id }}">
+                    <td class="check" align="center" style="cursor: pointer;"><input type="checkbox" name="array_id[]" value="{{ fornecedor.id }}" style="cursor: pointer;"></td>
+                    <td>{{ fornecedor.id }}</td>
+                    <td>{{ fornecedor.nome }}</td>
+                    <td>{{ fornecedor.email }}</td>
+                    <td align="center">
+                        <button class="btn btn-danger btn-xs excluir" id="del{{ fornecedor.id }}" type="button">Excluir</button>
+                        <button class="btn btn-primary btn-xs editar" id="edi{{ fornecedor.id }}" type="button">Editar</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button class="btn btn-primary" type="submit">Excluir selecionados</button>
+        </form>
+        <div class="" id="retorno">
+
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Nenhum fornecedor encontrado. <a class="alert-link" href="{{ linkInserir }}">Deseja adicionar?</a>.
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.editar').click(function() {
+                var id = $(this).attr('id').substr(3);
+
+                location.href = '{{ linkEditar }}'+id;
+            });
+
+            $(".check").click(function(e) {
+                var chk = $(this).closest("tr").find("input:checkbox").get(0);
+
+                if(e.target != chk)
+                {
+                    chk.checked = !chk.checked;
+                }
+            });
+
+            $('form#lista').submit(function() {
+                bootbox.confirm("Tem certeza que deseja excluir os selecionados?", function(result) {
+                    if (result) {
+
+                    }
+                });
+                return false;
+            });
+
+            $("#check_all").click(function(){
+                $('input:checkbox').not(this).prop('checked', this.checked);
+            });
+
+            $('.excluir').click(function() {
+                var id = $(this).attr('id').substr(3);
+
+                bootbox.confirm("Tem certeza que deseja excluir?", function(result) {
+                    if (result) {
+                        $.ajax({
+                            type: 'post',
+                            url: '{{ linkExcluir }}'+id,
+                            dataType: 'json',
+                            breforeSend: function() {
+                                $('button').attr('disabled', true);
+                                $('#retorno').removeClass('alert alert-success alert-danger alert-dismissable').text('');
+                            }
+                        }).done(function(json) {
+                            if (json.r) {
+                                $('#retorno').addClass('alert alert-success alert-dismissable');
+
+                                setTimeout(function() {
+                                    $('#row'+id).fadeOut();
+                                }, 1000);
+                            } else {
+                                $('#retorno').addClass('alert alert-danger alert-dismissable');
+                            }
+
+                            $('#retorno').html('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+json.m);
+                        }).fail(function() {
+                            $('#retorno').addClass('alert alert-danger alert-dismissable').html('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Erro ao excluir (View)');
+                        }).always(function() {
+                            $('button').attr('disabled', false);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
