@@ -1,31 +1,31 @@
 {% extends "layout.twig" %}
 
-{% block title %}Lista de Fornecedores{% endblock %}
+{% block title %}Lista de Produtos{% endblock %}
 
 {% block content %}
-    <h1>Lista de Fornecedores</h1>
-    {% if listaFornecedor|length > 0 %}
+    <h1>Lista de Produtos</h1>
+    {% if listaProduto|length > 0 %}
         <form method="post" id="lista" action="{{ linkExcluirLote }}">
-        <table id="lista_fornecedor" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <table id="lista_produto" class="table table-striped table-bordered" cellspacing="0" width="100%">
             <thead>
             <tr>
                 <th width="40" class="check" style="text-align: center;cursor: pointer;"><input type="checkbox" id="check_all" value="1" style="cursor: pointer;"></th>
                 <th>ID</th>
                 <th>Nome</th>
-                <th>Email</th>
+                <th>Fornecedor</th>
                 <th width="120" style="text-align: center;">Ação</th>
             </tr>
             </thead>
             <tbody>
-            {% for fornecedor in listaFornecedor %}
-                <tr id="row{{ fornecedor.id }}">
-                    <td class="check" align="center" style="cursor: pointer;"><input type="checkbox" name="array_id[]" value="{{ fornecedor.id }}" style="cursor: pointer;"></td>
-                    <td>{{ fornecedor.id }}</td>
-                    <td>{{ fornecedor.nome }}</td>
-                    <td>{{ fornecedor.email }}</td>
+            {% for produto in listaProduto %}
+                <tr id="row{{ produto.getID() }}">
+                    <td class="check" align="center" style="cursor: pointer;"><input type="checkbox" name="array_id[]" value="{{ produto.getID() }}" style="cursor: pointer;"></td>
+                    <td>{{ produto.getID() }}</td>
+                    <td>{{ produto.getNome() }}</td>
+                    <td>{{ produto.getFornecedor().getNome() }}</td>
                     <td align="center">
-                        <button class="btn btn-danger btn-xs excluir" id="del{{ fornecedor.id }}" type="button">Excluir</button>
-                        <button class="btn btn-primary btn-xs editar" id="edi{{ fornecedor.id }}" type="button">Editar</button>
+                        <button class="btn btn-danger btn-xs excluir" id="del{{ produto.getID() }}" type="button">Excluir</button>
+                        <button class="btn btn-primary btn-xs editar" id="edi{{ produto.getID() }}" type="button">Editar</button>
                     </td>
                 </tr>
             {% endfor %}
@@ -38,7 +38,7 @@
         </div>
     {% else %}
         <div class="alert alert-info">
-            Nenhum fornecedor encontrado. <a class="alert-link" href="{{ linkInserir }}">Deseja adicionar?</a>.
+            Nenhum produto encontrado. <a class="alert-link" href="{{ linkInserir }}">Deseja adicionar?</a>.
         </div>
     {% endif %}
 {% endblock %}

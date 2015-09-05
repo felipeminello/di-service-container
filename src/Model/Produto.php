@@ -5,10 +5,17 @@ use Lib\Model;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationExceptionInterface;
 
-class Fornecedor extends Model {
+class Produto extends Model {
     private $id;
     private $nome;
-    private $email;
+    private $unidade;
+    private $Fornecedor;
+
+	public function __construct(array $arrayDados = array()) {
+		parent::__construct();
+
+		$this->receberDados($arrayDados);
+	}
 
     public function getID() {
         return $this->id;
@@ -16,9 +23,17 @@ class Fornecedor extends Model {
     public function getNome() {
         return $this->nome;
     }
-    public function getEmail() {
-        return $this->email;
+    public function getUnidade() {
+        return $this->unidade;
     }
+
+    public function getFornecedor() {
+        return $this->Fornecedor;
+    }
+
+	public function setFornecedor(Fornecedor $f) {
+		$this->Fornecedor = $f;
+	}
 
     public function receberDados(array $arrayDados) {
         try {
@@ -30,26 +45,43 @@ class Fornecedor extends Model {
                 $this->nome = (v::string()->length(1, 50)->validate($arrayDados['nome'])) ? $arrayDados['nome'] : null;
             }
 
-            if (isset($arrayDados['email'])) {
-                $this->email = (v::email()->length(1, 255)->validate($arrayDados['email'])) ? $arrayDados['email'] : null;
-            }
-        } catch(NestedValidationExceptionInterface $e) {
+			if (isset($arrayDados['unidade'])) {
+				$this->unidade = (v::int()->validate($arrayDados['unidade'])) ? $arrayDados['unidade'] : 0;
+			}
+
+			if (isset($arrayDados['id_fornecedor'])) {
+				if (v::instance('Model\Fornecedor')->validate($this->Fornecedor)) {
+					$this->Fornecedor->selecionar($arrayDados['id_fornecedor']);
+
+
+				}
+			}
+
+			if (isset($arrayDados['Fornecedor'])) {
+				$this->Fornecedor = (v::instance('Model\Fornecedor')->validate($arrayDados['Fornecedor'])) ? $arrayDados['Fornecedor'] : null;
+			}
+
+
+
+		} catch(NestedValidationExceptionInterface $e) {
             throw new \Exception($e->getCode(), $e->getFullMessage());
         }
     }
 
 	public function validarCadastro() {
-		if (empty($this->nome)) {
+		$idFornecedor = $this->Fornecedor->getID();
+
+		if (empty($idFornecedor)) {
+			throw new \Exception('Selecione o fornecedor');
+		} elseif (empty($this->nome)) {
 			throw new \Exception('Preencha o nome');
-		} elseif (empty($this->email)) {
-			throw new \Exception('Preencha o email corretamente');
 		} else {
 			return true;
 		}
 	}
 
     public function selecionar($id) {
-        $sql = "SELECT * FROM fornecedores WHERE id = :id LIMIT 0,1";
+        $sql = "SELECT * FROM produtos WHERE id = :id LIMIT 0,1";
 
         try {
 			$id = (v::numeric()->validate($id)) ? $id : 0;
@@ -64,7 +96,7 @@ class Fornecedor extends Model {
                 if (is_array($linha)) {
                     $this->receberDados($linha);
                 } else {
-                    throw new \Exception('Fornecedor não encontrado');
+                    throw new \Exception('Produto não encontrado');
                 }
             } else {
                 $array = $stmt->errorInfo();
@@ -72,12 +104,12 @@ class Fornecedor extends Model {
             }
 
         } catch (\PDOException $e) {
-            throw $e;
+			throw $e;
         }
     }
 
     public function excluir() {
-        $sql = "DELETE FROM fornecedores WHERE id = :id";
+        $sql = "DELETE FROM produtos WHERE id = :id";
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -100,13 +132,14 @@ class Fornecedor extends Model {
 		try {
 			if ($this->validarCadastro()) {
 
-				$sql = "INSERT INTO fornecedores (nome, email) VALUES (:nome, :email)";
+				$sql = "INSERT INTO produtos (id_fornecedor, nome, unidade) VALUES (:id_fornecedor, :nome, :unidade)";
 
 				try {
 					$stmt = $this->db->prepare($sql);
 
+					$stmt->bindValue('id_fornecedor', $this->Fornecedor->getID(), \PDO::PARAM_INT);
 					$stmt->bindValue('nome', $this->nome, \PDO::PARAM_STR);
-					$stmt->bindValue('email', $this->email, \PDO::PARAM_STR);
+					$stmt->bindValue('unidade', $this->unidade, \PDO::PARAM_INT);
 
 					if ($stmt->execute()) {
 						$this->id = $this->db->lastInsertId();
@@ -130,19 +163,19 @@ class Fornecedor extends Model {
     public function atualizar() {
 		try {
 			if ($this->validarCadastro()) {
-				$sql = "UPDATE fornecedores SET nome = :nome, email = :email WHERE id = :id";
+				$sql = "UPDATE produtos SET id_fornecedor = :id_fornecedor, nome = :nome, unidade = :unidade WHERE id = :id";
 
 				try {
 					$stmt = $this->db->prepare($sql);
 
-					$stmt->bindValue('id', $this->id, \PDO::PARAM_STR);
+					$stmt->bindValue('id', $this->id, \PDO::PARAM_INT);
+					$stmt->bindValue('id_fornecedor', $this->Fornecedor->getID(), \PDO::PARAM_INT);
 					$stmt->bindValue('nome', $this->nome, \PDO::PARAM_STR);
-					$stmt->bindValue('email', $this->email, \PDO::PARAM_STR);
+					$stmt->bindValue('unidade', $this->unidade, \PDO::PARAM_STR);
 
 					if ($stmt->execute()) {
 						return true;
-					}
-					else {
+					} else {
 						$array = $stmt->errorInfo();
 						throw new \Exception($array[2], $array[1]);
 					}
@@ -151,19 +184,35 @@ class Fornecedor extends Model {
 					throw $e;
 				}
 			}
-		} catch (\Exception $e) {
+		} catch (\PDOException $e) {
 			throw $e;
 		}
     }
 
     public function listar() {
-        $sql = "SELECT * FROM fornecedores";
+        $sql = "SELECT p.*, f.id AS f_id, f.nome AS f_nome FROM produtos p LEFT JOIN (fornecedores f) ON f.id = p.id_fornecedor GROUP BY p.id";
 
         try {
             $stmt = $this->db->query($sql);
 
             if ($stmt->execute()) {
-                return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+				$array = array();
+                $linhas = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+				foreach($linhas as $linha) {
+					unset($linha['id_fornecedor']);
+
+					$f = new Fornecedor();
+					$f->receberDados(array('id' => $linha['f_id'], 'nome' => $linha['f_nome']));
+
+					$linha['Fornecedor'] = $f;
+
+					$p = new Produto($linha);
+
+					$array[] = $p;
+				}
+
+				return $array;
 
             } else {
                 $array = $stmt->errorInfo();
@@ -171,7 +220,7 @@ class Fornecedor extends Model {
             }
 
         } catch (\PDOException $e) {
-            throw $e;
+			throw $e;
         }
     }
 }

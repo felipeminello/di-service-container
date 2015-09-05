@@ -2,23 +2,25 @@
 namespace Controller;
 
 use Model\Fornecedor;
+use Model\Produto;
 
-class FornecedorController extends \Lib\Controller {
+class ProdutoController extends \Lib\Controller {
     public function listar() {
-
-        $f = new Fornecedor();
+		$f = new Fornecedor();
 
         try {
-            $listaFornecedor = $f->listar();
+			$p = new Produto(array('Fornecedor' => $f));
+
+            $listaProduto = $p->listar();
 
             return $this->twig->render(
-                'fornecedor/listar.twig',
+                'produto/listar.twig',
                 array(
-                    'listaFornecedor' => $listaFornecedor,
-                    'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/',
-                    'linkInserir'    => $this->config['dirPublic'].'fornecedor/cadastro/',
-                    'linkExcluir'    => $this->config['dirPublic'].'fornecedor/excluir/json/',
-                    'linkExcluirLote'    => $this->config['dirPublic'].'fornecedor/excluir-lote/html/',
+                    'listaProduto' => $listaProduto,
+                    'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/',
+                    'linkInserir'    => $this->config['dirPublic'].'produto/cadastro/',
+                    'linkExcluir'    => $this->config['dirPublic'].'produto/excluir/json/',
+                    'linkExcluirLote'    => $this->config['dirPublic'].'produto/excluir-lote/html/',
                 )
             );
         } catch (\Exception $e) {
@@ -30,11 +32,16 @@ class FornecedorController extends \Lib\Controller {
     }
 
     public function cadastro($id = 0) {
-        $f = new Fornecedor();
+        $p = new Produto();
+		$f = new Fornecedor();
 
         try {
+			$p = new Produto(array('Fornecedor' => $f));
+
+			$arrayFornecedor = $f->listar();
+
             if ($id > 0) {
-                $f->selecionar($id);
+				$p->selecionar($id);
 
                 $pagina = 'editar/'.$id;
             } else {
@@ -42,11 +49,12 @@ class FornecedorController extends \Lib\Controller {
             }
 
             return $this->twig->render(
-                'fornecedor/cadastro.twig',
+                'produto/cadastro.twig',
                 array(
-                    'fornecedor' => $f,
-                    'action' => $this->config['dirPublic'].'fornecedor/'.$pagina,
-                    'linkListar' => $this->config['dirPublic'].'fornecedor/listar/',
+                    'produto' => $p,
+					'listaFornecedor' => $arrayFornecedor,
+                    'action' => $this->config['dirPublic'].'produto/'.$pagina,
+                    'linkListar' => $this->config['dirPublic'].'produto/listar/',
                 )
             );
         } catch (\Exception $e) {
@@ -59,26 +67,26 @@ class FornecedorController extends \Lib\Controller {
 
     public function excluir($retorno = null, $id = 0) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
+        $p = new Produto();
 
         try {
-            $f->selecionar($id);
+            $p->selecionar($id);
 
-            if ($f->excluir()) {
+            if ($p->excluir()) {
                 $arrayRetorno['r'] = true;
-                $arrayRetorno['m'] = 'Fornecedor excluído com sucesso';
+                $arrayRetorno['m'] = 'Produto excluído com sucesso';
             } else {
                 $arrayRetorno['r'] = false;
-                $arrayRetorno['m'] = 'Problema ao excluir (FornecedorController)';
+                $arrayRetorno['m'] = 'Problema ao excluir (ProdutoController)';
             }
 
             if (strtolower($retorno) == 'json') {
                 return json_encode($arrayRetorno);
             } else {
                 return $this->twig->render(
-                    'fornecedor/excluir.twig',
+                    'produto/excluir.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'produto'    => $p,
                         'retorno'       => $arrayRetorno,
                     )
                 );
@@ -93,18 +101,18 @@ class FornecedorController extends \Lib\Controller {
 
     public function excluirLote($retorno = null, array $arrayID = array()) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
+        $p = new Produto();
 
         try {
             foreach ($arrayID as $id) {
-                $f->selecionar($id);
+                $p->selecionar($id);
 
-                if ($f->excluir()) {
+                if ($p->excluir()) {
                     $arrayRetorno['r'] = true;
-                    $arrayRetorno['m'] = 'Fornecedores excluídos com sucesso';
+                    $arrayRetorno['m'] = 'Produtoes excluídos com sucesso';
                 } else {
                     $arrayRetorno['r'] = false;
-                    $arrayRetorno['m'] = 'Problema ao excluir (FornecedorController)';
+                    $arrayRetorno['m'] = 'Problema ao excluir (ProdutoController)';
 
                     break;
                 }
@@ -114,9 +122,9 @@ class FornecedorController extends \Lib\Controller {
                 return json_encode($arrayRetorno);
             } else {
                 return $this->twig->render(
-                    'fornecedor/excluir.twig',
+                    'produto/excluir.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'produto'    => $p,
                         'retorno'       => $arrayRetorno,
                     )
                 );
@@ -134,27 +142,29 @@ class FornecedorController extends \Lib\Controller {
         $f = new Fornecedor();
 
         try {
-            $f->receberDados($arrayPost);
+			$p = new Produto(array('Fornecedor' => $f));
 
-            if ($f->inserir()) {
+            $p->receberDados($arrayPost);
+
+            if ($p->inserir()) {
                 $arrayRetorno['r'] = true;
-                $arrayRetorno['m'] = 'Fornecedor inserido com sucesso';
+                $arrayRetorno['m'] = 'Produto inserido com sucesso';
             } else {
                 $arrayRetorno['r'] = false;
-                $arrayRetorno['m'] = 'Problema ao inserir (FornecedorController)';
+                $arrayRetorno['m'] = 'Problema ao inserir (ProdutoController)';
             }
 
             if (strtolower($retorno) == 'json') {
                 return json_encode($arrayRetorno);
             } else {
                 return $this->twig->render(
-                    'fornecedor/visualizar.twig',
+                    'produto/visualizar.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'produto'    => $p,
                         'retorno'       => $arrayRetorno,
-                        'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/'.$f->getID(),
-                        'linkInserir'    => $this->config['dirPublic'].'fornecedor/cadastro/',
-                        'linkListar'    => $this->config['dirPublic'].'fornecedor/listar/',
+                        'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/'.$p->getID(),
+                        'linkInserir'    => $this->config['dirPublic'].'produto/cadastro/',
+                        'linkListar'    => $this->config['dirPublic'].'produto/listar/',
                     )
                 );
             }
@@ -168,30 +178,32 @@ class FornecedorController extends \Lib\Controller {
 
     public function atualizar($retorno = null) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
+		$f = new Fornecedor();
 
         try {
-            $f->receberDados($_POST);
+			$p = new Produto(array('Fornecedor' => $f));
 
-            if ($f->atualizar()) {
+            $p->receberDados($_POST);
+
+            if ($p->atualizar()) {
                 $arrayRetorno['r'] = true;
-                $arrayRetorno['m'] = 'Fornecedor atualizado com sucesso';
+                $arrayRetorno['m'] = 'Produto atualizado com sucesso';
             } else {
                 $arrayRetorno['r'] = false;
-                $arrayRetorno['m'] = 'Problema ao atualizar (FornecedorController)';
+                $arrayRetorno['m'] = 'Problema ao atualizar (ProdutoController)';
             }
 
             if (strtolower($retorno) == 'json') {
                 return json_encode($arrayRetorno);
             } else {
                 return $this->twig->render(
-                    'fornecedor/visualizar.twig',
+                    'produto/visualizar.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'produto'    => $p,
                         'retorno'       => $arrayRetorno,
-                        'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/'.$f->getID(),
-                        'linkInserir'    => $this->config['dirPublic'].'fornecedor/cadastro/',
-                        'linkListar'    => $this->config['dirPublic'].'fornecedor/listar/',
+                        'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/'.$p->getID(),
+                        'linkInserir'    => $this->config['dirPublic'].'produto/cadastro/',
+                        'linkListar'    => $this->config['dirPublic'].'produto/listar/',
                     )
                 );
             }
