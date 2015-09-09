@@ -1,7 +1,5 @@
 <?php
-use Controller\ProdutoController;
-
-$p = new ProdutoController();
+$p = $container['produto-controller'];
 
 $arrayID = $_POST['array_id'];
 

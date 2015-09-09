@@ -1,17 +1,16 @@
 <?php
 namespace Controller;
 
-use Model\Fornecedor;
-use Model\Produto;
+class ProdutoController extends \Libraries\Controller {
+	private $Produto;
 
-class ProdutoController extends \Lib\Controller {
+	public function setProduto($p) {
+		$this->Produto = $p;
+	}
+
     public function listar() {
-		$f = new Fornecedor();
-
         try {
-			$p = new Produto(array('Fornecedor' => $f));
-
-            $listaProduto = $p->listar();
+            $listaProduto = $this->Produto->listar();
 
             return $this->twig->render(
                 'produto/listar.twig',
@@ -32,16 +31,11 @@ class ProdutoController extends \Lib\Controller {
     }
 
     public function cadastro($id = 0) {
-        $p = new Produto();
-		$f = new Fornecedor();
-
         try {
-			$p = new Produto(array('Fornecedor' => $f));
-
-			$arrayFornecedor = $f->listar();
+			$arrayFornecedor = $this->Produto->getFornecedor()->listar();
 
             if ($id > 0) {
-				$p->selecionar($id);
+				$this->Produto->selecionar($id);
 
                 $pagina = 'editar/'.$id;
             } else {
@@ -51,7 +45,7 @@ class ProdutoController extends \Lib\Controller {
             return $this->twig->render(
                 'produto/cadastro.twig',
                 array(
-                    'produto' => $p,
+                    'produto' => $this->Produto,
 					'listaFornecedor' => $arrayFornecedor,
                     'action' => $this->config['dirPublic'].'produto/'.$pagina,
                     'linkListar' => $this->config['dirPublic'].'produto/listar/',
@@ -67,12 +61,11 @@ class ProdutoController extends \Lib\Controller {
 
     public function excluir($retorno = null, $id = 0) {
         $arrayRetorno = array();
-        $p = new Produto();
 
         try {
-            $p->selecionar($id);
+            $this->Produto->selecionar($id);
 
-            if ($p->excluir()) {
+            if ($this->Produto->excluir()) {
                 $arrayRetorno['r'] = true;
                 $arrayRetorno['m'] = 'Produto excluído com sucesso';
             } else {
@@ -86,7 +79,7 @@ class ProdutoController extends \Lib\Controller {
                 return $this->twig->render(
                     'produto/excluir.twig',
                     array(
-                        'produto'    => $p,
+                        'produto'    => $this->Produto,
                         'retorno'       => $arrayRetorno,
                     )
                 );
@@ -101,13 +94,12 @@ class ProdutoController extends \Lib\Controller {
 
     public function excluirLote($retorno = null, array $arrayID = array()) {
         $arrayRetorno = array();
-        $p = new Produto();
 
         try {
             foreach ($arrayID as $id) {
-                $p->selecionar($id);
+                $this->Produto->selecionar($id);
 
-                if ($p->excluir()) {
+                if ($this->Produto->excluir()) {
                     $arrayRetorno['r'] = true;
                     $arrayRetorno['m'] = 'Produtoes excluídos com sucesso';
                 } else {
@@ -124,7 +116,7 @@ class ProdutoController extends \Lib\Controller {
                 return $this->twig->render(
                     'produto/excluir.twig',
                     array(
-                        'produto'    => $p,
+                        'produto'    => $this->Produto,
                         'retorno'       => $arrayRetorno,
                     )
                 );
@@ -139,14 +131,12 @@ class ProdutoController extends \Lib\Controller {
 
     public function inserir($retorno = null, array $arrayPost = array()) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
 
         try {
-			$p = new Produto(array('Fornecedor' => $f));
 
-            $p->receberDados($arrayPost);
+            $this->Produto->receberDados($arrayPost);
 
-            if ($p->inserir()) {
+            if ($this->Produto->inserir()) {
                 $arrayRetorno['r'] = true;
                 $arrayRetorno['m'] = 'Produto inserido com sucesso';
             } else {
@@ -160,9 +150,9 @@ class ProdutoController extends \Lib\Controller {
                 return $this->twig->render(
                     'produto/visualizar.twig',
                     array(
-                        'produto'    => $p,
+                        'produto'    => $this->Produto,
                         'retorno'       => $arrayRetorno,
-                        'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/'.$p->getID(),
+                        'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/'.$this->Produto->getID(),
                         'linkInserir'    => $this->config['dirPublic'].'produto/cadastro/',
                         'linkListar'    => $this->config['dirPublic'].'produto/listar/',
                     )
@@ -178,14 +168,10 @@ class ProdutoController extends \Lib\Controller {
 
     public function atualizar($retorno = null) {
         $arrayRetorno = array();
-		$f = new Fornecedor();
-
         try {
-			$p = new Produto(array('Fornecedor' => $f));
+            $this->Produto->receberDados($_POST);
 
-            $p->receberDados($_POST);
-
-            if ($p->atualizar()) {
+            if ($this->Produto->atualizar()) {
                 $arrayRetorno['r'] = true;
                 $arrayRetorno['m'] = 'Produto atualizado com sucesso';
             } else {
@@ -199,9 +185,9 @@ class ProdutoController extends \Lib\Controller {
                 return $this->twig->render(
                     'produto/visualizar.twig',
                     array(
-                        'produto'    => $p,
+                        'produto'    => $this->Produto,
                         'retorno'       => $arrayRetorno,
-                        'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/'.$p->getID(),
+                        'linkEditar'    => $this->config['dirPublic'].'produto/cadastro/'.$this->Produto->getID(),
                         'linkInserir'    => $this->config['dirPublic'].'produto/cadastro/',
                         'linkListar'    => $this->config['dirPublic'].'produto/listar/',
                     )

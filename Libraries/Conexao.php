@@ -1,5 +1,5 @@
 <?php
-namespace Lib;
+namespace Libraries;
 
 class Conexao implements ConexaoInterface {
     private $host;

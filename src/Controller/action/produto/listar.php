@@ -1,7 +1,5 @@
 <?php
-use Controller\ProdutoController;
-
-$p = new ProdutoController();
+$p = $container['produto-controller'];
 
 echo $p->listar();
 

@@ -1,7 +1,5 @@
 <?php
-use Controller\FornecedorController;
+$f = $container['fornecedor-controller'];
 
-$fController = new FornecedorController();
-
-echo $fController->excluir($arrayUrl[2], $arrayUrl[3]);
+echo $f->excluir($arrayUrl[2], $arrayUrl[3]);
 

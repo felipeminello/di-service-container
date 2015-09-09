@@ -1,5 +1,5 @@
 <?php
-namespace Lib;
+namespace Libraries;
 
 abstract class Controller {
     protected $twig;

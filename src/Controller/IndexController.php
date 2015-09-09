@@ -2,7 +2,7 @@
 namespace Controller;
 
 
-class IndexController extends \Lib\Controller {
+class IndexController extends \Libraries\Controller {
     public function index() {
         return $this->twig->render('index/home.twig');
     }

@@ -1,9 +1,7 @@
 <?php
-use Controller\FornecedorController;
-
-$fController = new FornecedorController();
+$f = $container['fornecedor-controller'];
 
 $arrayPost = $_POST;
 
-echo $fController->inserir(null, $arrayPost);
+echo $f->inserir(null, $arrayPost);
 

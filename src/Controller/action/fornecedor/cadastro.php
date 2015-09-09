@@ -1,9 +1,7 @@
 <?php
-use Controller\FornecedorController;
-
-$fController = new FornecedorController();
+$f = $container['fornecedor-controller'];
 
 $id = (isset($arrayUrl[2])) ? $arrayUrl[2] : 0;
 
-echo $fController->cadastro($id);
+echo $f->cadastro($id);
 

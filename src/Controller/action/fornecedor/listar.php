@@ -1,7 +1,5 @@
 <?php
-use Controller\FornecedorController;
+$f = $container['fornecedor-controller'];
 
-$fController = new FornecedorController();
-
-echo $fController->listar();
+echo $f->listar();
 

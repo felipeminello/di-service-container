@@ -1,6 +1,4 @@
 <?php
-use Controller\IndexController;
+$ic = $container['index-controller'];
 
-$indexController = new IndexController($this->config);
-
-echo $indexController->error404();
+echo $ic->error404();

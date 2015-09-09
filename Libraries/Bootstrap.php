@@ -1,5 +1,5 @@
 <?php
-namespace Lib;
+namespace Libraries;
 
 class Bootstrap {
     private $url;
@@ -12,6 +12,9 @@ class Bootstrap {
 
     public function run() {
         $arrayUrl = explode('/', $this->url);
+
+		$s = new Servicos();
+		$container = $s->getContainer();
 
         if (empty($this->url)) {
             include $this->config['dir-action'] . 'home.php';

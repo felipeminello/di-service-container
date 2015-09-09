@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['SERVER_NAME'] == '192.168.1.4') {
+if ($_SERVER['SERVER_NAME'] == 'ubuntu.casa') {
 	return array(
 		'dir-action' => __DIR__.'/../src/Controller/action/',
 		'dir-view' => __DIR__.'/../src/view/',
@@ -8,7 +8,7 @@ if ($_SERVER['SERVER_NAME'] == '192.168.1.4') {
 
 		'dbhost'        => 'localhost',
 		'dbname'        => 'di-service-container',
-		'dbuser'        => 'root',
+		'dbuser'        => 'minello',
 		'dbpassword'    => 'camarao',
 	);
 } else {

@@ -1,15 +1,23 @@
 {
-    "require": {
-        "php": ">=5.4",
-        "twig/twig": "~1.0",
-        "respect/validation": "^0.9.3"
-    },
-
-    "autoload": {
-        "psr-4": {
-            "Model\\": "src/Model/",
-            "Controller\\": "src/Controller/",
-            "Lib\\": "libraries/"
-        }
+  "autors" : [
+    {
+      "name": "Felipe Minello",
+      "email": "felipeminello@gmail.com",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "twig/twig": "~1.0",
+    "respect/validation": "^0.9.3",
+    "pimple/pimple": "1.*"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "Model\\": "src/Model/",
+      "Controller\\": "src/Controller/",
+      "Libraries\\": "Libraries/"
+    }
+  }
 }

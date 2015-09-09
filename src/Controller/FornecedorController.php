@@ -1,15 +1,16 @@
 <?php
 namespace Controller;
 
-use Model\Fornecedor;
+class FornecedorController extends \Libraries\Controller {
+	private $Fornecedor;
 
-class FornecedorController extends \Lib\Controller {
+	public function setFornecedor($f) {
+		$this->Fornecedor = $f;
+	}
+
     public function listar() {
-
-        $f = new Fornecedor();
-
         try {
-            $listaFornecedor = $f->listar();
+            $listaFornecedor = $this->Fornecedor->listar();
 
             return $this->twig->render(
                 'fornecedor/listar.twig',
@@ -30,11 +31,9 @@ class FornecedorController extends \Lib\Controller {
     }
 
     public function cadastro($id = 0) {
-        $f = new Fornecedor();
-
         try {
             if ($id > 0) {
-                $f->selecionar($id);
+                $this->Fornecedor->selecionar($id);
 
                 $pagina = 'editar/'.$id;
             } else {
@@ -44,7 +43,7 @@ class FornecedorController extends \Lib\Controller {
             return $this->twig->render(
                 'fornecedor/cadastro.twig',
                 array(
-                    'fornecedor' => $f,
+                    'fornecedor' => $this->Fornecedor,
                     'action' => $this->config['dirPublic'].'fornecedor/'.$pagina,
                     'linkListar' => $this->config['dirPublic'].'fornecedor/listar/',
                 )
@@ -59,12 +58,11 @@ class FornecedorController extends \Lib\Controller {
 
     public function excluir($retorno = null, $id = 0) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
 
         try {
-            $f->selecionar($id);
+            $this->Fornecedor->selecionar($id);
 
-            if ($f->excluir()) {
+            if ($this->Fornecedor->excluir()) {
                 $arrayRetorno['r'] = true;
                 $arrayRetorno['m'] = 'Fornecedor excluído com sucesso';
             } else {
@@ -78,7 +76,7 @@ class FornecedorController extends \Lib\Controller {
                 return $this->twig->render(
                     'fornecedor/excluir.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'fornecedor'    => $this->Fornecedor,
                         'retorno'       => $arrayRetorno,
                     )
                 );
@@ -93,13 +91,12 @@ class FornecedorController extends \Lib\Controller {
 
     public function excluirLote($retorno = null, array $arrayID = array()) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
 
         try {
             foreach ($arrayID as $id) {
-                $f->selecionar($id);
+                $this->Fornecedor->selecionar($id);
 
-                if ($f->excluir()) {
+                if ($this->Fornecedor->excluir()) {
                     $arrayRetorno['r'] = true;
                     $arrayRetorno['m'] = 'Fornecedores excluídos com sucesso';
                 } else {
@@ -116,7 +113,7 @@ class FornecedorController extends \Lib\Controller {
                 return $this->twig->render(
                     'fornecedor/excluir.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'fornecedor'    => $this->Fornecedor,
                         'retorno'       => $arrayRetorno,
                     )
                 );
@@ -131,12 +128,12 @@ class FornecedorController extends \Lib\Controller {
 
     public function inserir($retorno = null, array $arrayPost = array()) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
+        
 
         try {
-            $f->receberDados($arrayPost);
+            $this->Fornecedor->receberDados($arrayPost);
 
-            if ($f->inserir()) {
+            if ($this->Fornecedor->inserir()) {
                 $arrayRetorno['r'] = true;
                 $arrayRetorno['m'] = 'Fornecedor inserido com sucesso';
             } else {
@@ -150,9 +147,9 @@ class FornecedorController extends \Lib\Controller {
                 return $this->twig->render(
                     'fornecedor/visualizar.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'fornecedor'    => $this->Fornecedor,
                         'retorno'       => $arrayRetorno,
-                        'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/'.$f->getID(),
+                        'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/'.$this->Fornecedor->getID(),
                         'linkInserir'    => $this->config['dirPublic'].'fornecedor/cadastro/',
                         'linkListar'    => $this->config['dirPublic'].'fornecedor/listar/',
                     )
@@ -168,12 +165,12 @@ class FornecedorController extends \Lib\Controller {
 
     public function atualizar($retorno = null) {
         $arrayRetorno = array();
-        $f = new Fornecedor();
+        
 
         try {
-            $f->receberDados($_POST);
+            $this->Fornecedor->receberDados($_POST);
 
-            if ($f->atualizar()) {
+            if ($this->Fornecedor->atualizar()) {
                 $arrayRetorno['r'] = true;
                 $arrayRetorno['m'] = 'Fornecedor atualizado com sucesso';
             } else {
@@ -187,9 +184,9 @@ class FornecedorController extends \Lib\Controller {
                 return $this->twig->render(
                     'fornecedor/visualizar.twig',
                     array(
-                        'fornecedor'    => $f,
+                        'fornecedor'    => $this->Fornecedor,
                         'retorno'       => $arrayRetorno,
-                        'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/'.$f->getID(),
+                        'linkEditar'    => $this->config['dirPublic'].'fornecedor/cadastro/'.$this->Fornecedor->getID(),
                         'linkInserir'    => $this->config['dirPublic'].'fornecedor/cadastro/',
                         'linkListar'    => $this->config['dirPublic'].'fornecedor/listar/',
                     )

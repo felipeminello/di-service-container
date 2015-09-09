@@ -1,7 +1,7 @@
 <?php
 namespace Model;
 
-use Lib\Model;
+use Libraries\Model;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationExceptionInterface;
 
